@@ -3,7 +3,7 @@ import "./App.css";
 import styled from "styled-components";
 
 const Body = styled.div`
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -35,6 +35,7 @@ const Container = styled.div`
   padding-top: 2em;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 `;
 
 const JesusPhoto = styled.img`
@@ -43,18 +44,22 @@ const JesusPhoto = styled.img`
   display: flex;
   align-self: flex-end;
   filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.25));
+
+  @media (max-width: 575.98px) {
+    width: 100%;
+  }
 `;
 
 const Main = styled.div`
+  margin: 0 5%;
   display: flex;
   flex: 1;
-  padding: 0 1em;
   flex-direction: column;
 `;
 
 const AnimatedTypewritterStyle = styled.div`
   font-weight: 400;
-  font-size: 2em;
+  font-size: 1.5em;
   white-space: pre-line;
 `;
 
@@ -80,6 +85,10 @@ const AnimatedTypewritter = ({ children, setAnimationEnded = undefined }) => {
 const FormWrapper = styled.form`
   margin-top: 2em;
   width: 50%;
+
+  @media (max-width: 575.98px) {
+    width: 100%;
+  }
 `;
 
 const FormControl = styled.div`
@@ -90,9 +99,9 @@ const FormControl = styled.div`
   button[type="submit"] {
     color: black;
     padding: 0.5em;
-    font-size: 18px;
+    font-size: 15px;
     font-family: inherit;
-    border: 2px solid white;
+    border: 1px solid white;
     border-radius: 5px;
     text-align: left;
     background-color: white;
@@ -103,12 +112,20 @@ const FormControl = styled.div`
   }
 `;
 
+const Instructions = styled.div`
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: 15px;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
+`;
+
 function App() {
   const [animationHasEnded, setAnimationEnded] = useState(false);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    name: ""
+    name: "",
+    comment: ""
   });
 
   const onSubmit = e => {
@@ -133,11 +150,13 @@ function App() {
         <Main>
           {!formSent && (
             <AnimatedTypewritter setAnimationEnded={setAnimationEnded}>
-              {`Hey, there. It's my 30s birthday.
-
-          Would you like to contribute to it?
-          
-          If yes, send me your wish in a mini-clip.`}
+              {`Heeey! Ionut here ;). Jesús is getting old. To be exactly, he'll be 30 very soon... 
+              
+              Due to the importance of this event... I had an idea and I want you to be IN. 😎
+              
+              I'd like you to be part of the celebration 🎉, of the new chapter of his life. 
+              
+              What do you have to do? Submit your wish (a mini-clip) until next June 23rd.`}
             </AnimatedTypewritter>
           )}
           {formSent && (
@@ -146,34 +165,50 @@ function App() {
             </AnimatedTypewritter>
           )}
           {animationHasEnded && !formSent && (
-            <FormWrapper onSubmit={onSubmit}>
-              <FormControl>
-                <input
-                  onChange={handleInputChange}
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  placeholder="Enter your email"
-                />
-              </FormControl>
-              <FormControl>
-                <input
-                  onChange={handleInputChange}
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  placeholder="Enter your name"
-                />
-              </FormControl>
-              <FormControl>
-                <input type="file" />
-              </FormControl>
-              <FormControl>
-                <button className="" type="submit">
-                  Send your wish
-                </button>
-              </FormControl>
-            </FormWrapper>
+            <>
+              <FormWrapper onSubmit={onSubmit}>
+                <FormControl>
+                  <input
+                    onChange={handleInputChange}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    placeholder="Enter your email"
+                  />
+                </FormControl>
+                <FormControl>
+                  <input
+                    onChange={handleInputChange}
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    placeholder="Enter your name"
+                  />
+                </FormControl>
+                <FormControl>
+                  <input
+                    onChange={handleInputChange}
+                    type="text"
+                    name="comment"
+                    value={formData.comment}
+                    placeholder="Enter a comment"
+                  />
+                </FormControl>
+                <FormControl>
+                  <input type="file" />
+                </FormControl>
+                <FormControl>
+                  <button className="" type="submit">
+                    Send your wish
+                  </button>
+                </FormControl>
+                <Instructions>
+                  Submit a short video with a duration of 15-30s in common video
+                  format. You can re-submit it, just let me know which version I
+                  should use.
+                </Instructions>
+              </FormWrapper>
+            </>
           )}
         </Main>
       </Container>
