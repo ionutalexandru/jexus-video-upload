@@ -189,15 +189,18 @@ const AnimatedConversation = ({
 const LANGUAGES = ["en", "es"];
 
 function App() {
-  const [language, setLanguage] = useState(
-    LANGUAGES.includes(window.navigator.language.slice(0, 2))
-      ? window.navigator.language.slice(0, 2)
-      : "en"
-  );
+  const [language, setLanguage] = useState("en");
+
+  useEffect(() => {
+    const browserLanguage = window.navigator.language.slice(0, 2);
+    if (LANGUAGES.includes(browserLanguage)) {
+      setLanguage(browserLanguage);
+    }
+  }, []);
+
   const [animationHasEnded, setAnimationEnded] = useState(false);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
     name: "",
     comment: ""
   });
@@ -376,15 +379,6 @@ function App() {
           {animationHasEnded && !formSent && (
             <>
               <FormWrapper onSubmit={onSubmit}>
-                <FormControl>
-                  <input
-                    onChange={handleInputChange}
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    placeholder="Email"
-                  />
-                </FormControl>
                 <FormControl>
                   <input
                     onChange={handleInputChange}
