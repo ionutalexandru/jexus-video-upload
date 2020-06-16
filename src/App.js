@@ -15,6 +15,8 @@ const Header = styled.header`
   background-color: rgba(255, 255, 255, 0.95);
   box-shadow: 0px 7px 11px 0px rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Logo = styled.h1`
@@ -28,6 +30,15 @@ const Logo = styled.h1`
     font-weight: 800;
     letter-spacing: -2px;
   }
+`;
+
+const Language = styled.div`
+  font-weight: 400;
+  margin: 0;
+  font-size: 1.5em;
+  color: #000000;
+  text-transform: uppercase;
+  cursor: pointer;
 `;
 
 const Container = styled.div`
@@ -129,12 +140,23 @@ const Message = styled.div`
   }
 `;
 
+const getTranslatedText = (text, language) => {
+  if (typeof text === "object") {
+    return text[language];
+  }
+  return text;
+};
+
 const AnimatedConversationWrapper = styled.div`
   width: 100%;
   padding: 0 0.5em;
 `;
 
-const AnimatedConversation = ({ conversation, setAnimationEnded }) => {
+const AnimatedConversation = ({
+  conversation,
+  setAnimationEnded,
+  language
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -156,14 +178,21 @@ const AnimatedConversation = ({ conversation, setAnimationEnded }) => {
     <AnimatedConversationWrapper>
       {conversation.slice(0, currentIndex).map(({ type, text, id }) => (
         <Message key={`message-${id}`} type={type}>
-          <span>{text}</span>
+          <span>{getTranslatedText(text, language)}</span>
         </Message>
       ))}
     </AnimatedConversationWrapper>
   );
 };
 
+const LANGUAGES = ["en", "es"];
+
 function App() {
+  const [language, setLanguage] = useState(
+    LANGUAGES.includes(window.navigator.language.slice(0, 2))
+      ? window.navigator.language.slice(0, 2)
+      : "en"
+  );
   const [animationHasEnded, setAnimationEnded] = useState(false);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({
@@ -187,71 +216,158 @@ function App() {
   return (
     <Body>
       <Header>
-        <Logo>A wish for Jesús</Logo>
+        <Logo>
+          {getTranslatedText(
+            { en: "A wish for Jesús", es: "Un deseo para Jesús" },
+            language
+          )}
+        </Logo>
+        <Language
+          onClick={() =>
+            language === "en" ? setLanguage("es") : setLanguage("en")
+          }
+        >
+          {language}
+        </Language>
       </Header>
       <Container>
         <JesusPhoto src={`${process.env.PUBLIC_URL}/jesus.png`} alt="Jesus" />
         <Main>
           {!formSent && (
             <AnimatedConversation
+              language={language}
               conversation={[
-                { id: 1, type: "RECEIVED", text: "Guess who's here?" },
-                { id: 2, type: "SENT", text: "Who?? 🤔" },
-                { id: 3, type: "RECEIVED", text: "Ionut is here 😎" },
-                { id: 4, type: "SENT", text: "What do you want from me? 😏" },
+                {
+                  id: 1,
+                  type: "RECEIVED",
+                  text: {
+                    en: "Guess who's here",
+                    es: "Adivina quién está aquí"
+                  }
+                },
+                {
+                  id: 2,
+                  type: "SENT",
+                  text: { en: "Who?? 🤔", es: "Quién?? 🤔" }
+                },
+                {
+                  id: 3,
+                  type: "RECEIVED",
+                  text: { en: "Ionut is here 😎", es: "Ionut está aquí 😎" }
+                },
+                {
+                  id: 4,
+                  type: "SENT",
+                  text: {
+                    en: "What do you want from me? 😏",
+                    es: "Qué quieres de mí? 😏"
+                  }
+                },
                 {
                   id: 5,
                   type: "RECEIVED",
-                  text: "As you may know, Jesús is getting..."
+                  text: {
+                    en: "As you may know, Jesús is getting...",
+                    es: "Como sabrás, Jesús está..."
+                  }
                 },
                 {
                   id: 6,
                   type: "RECEIVED",
-                  text: "Really old..."
+                  text: { en: "Really old...", es: "Envejeciendo mucho..." }
                 },
-                { id: 7, type: "RECEIVED", text: "He'll be 30 yo very soon" },
+                {
+                  id: 7,
+                  type: "RECEIVED",
+                  text: {
+                    en: "He'll be 30 yo very soon",
+                    es: "Tendrá 30 muy pronto"
+                  }
+                },
                 { id: 8, type: "SENT", text: "🙀" },
-                { id: 9, type: "RECEIVED", text: "HAHAHAH 😂" },
+                {
+                  id: 9,
+                  type: "RECEIVED",
+                  text: { en: "HAHAHAH 😂", es: "JAJAJAJA 😂" }
+                },
                 {
                   id: 10,
                   type: "RECEIVED",
-                  text:
-                    "I want to prepare for him a big surprise. Are you curious? 😏"
+                  text: {
+                    en:
+                      "I want to prepare for him a big surprise. Are you curious? 😏",
+                    es:
+                      "Quiero prepararle una gran sorpresa. Tienes curiosidad? 😏"
+                  }
                 },
-                { id: 11, type: "SENT", text: "YESSS!!! 😎" },
+                {
+                  id: 11,
+                  type: "SENT",
+                  text: { en: "YESSS!!! 😎", es: "SÍÍÍÍ!!! 😎" }
+                },
                 {
                   id: 12,
                   type: "RECEIVED",
-                  text:
-                    "Coool! I want you to record a short video wishing him something"
+                  text: {
+                    en:
+                      "Coool! I want you to record a short video wishing him something",
+                    es:
+                      "Genial! Quiero que grabes un pequeño vídeo deseándole algo"
+                  }
                 },
                 {
                   id: 13,
                   type: "RECEIVED",
-                  text:
-                    'Maybe... "I loveee you!! Your the best and I wish you for the 30s to be more quiet" 😂'
+                  text: {
+                    en:
+                      'Maybe... "I loveee you!! Your the best and I wish you for the 30s to be more quiet" 😂',
+                    es:
+                      'Quizás... "Te quierooo!! Eres el mejor y deseo que para los 30 seas más calladito" 😂'
+                  }
                 },
                 {
                   id: 14,
                   type: "RECEIVED",
-                  text:
-                    "Whatever you want. 15-30s duration is enough. You can do it until June 23rd"
+                  text: {
+                    en:
+                      "Whatever you want. 15-30s duration is enough. You can do it until June 23rd",
+                    es:
+                      "Lo que quieras. 15-30s de duración es suficiente. Puedes hacerlo antes del 23 de junio"
+                  }
                 },
                 {
                   id: 15,
                   type: "RECEIVED",
-                  text: "So take your phone, press REC and fill the next form."
+                  text: {
+                    en: "So take your phone, press REC and fill the next form.",
+                    es:
+                      "Por lo que, coge tu móvil, pulsa REC y rellena el siguiente formulario."
+                  }
                 },
-                { id: 16, type: "RECEIVED", text: "Thank you <3" }
+                {
+                  id: 16,
+                  type: "RECEIVED",
+                  text: { en: "Thank you <3", es: "Muchas gracias <3" }
+                }
               ]}
               setAnimationEnded={setAnimationEnded}
             />
           )}
           {formSent && (
             <AnimatedConversation
+              language={language}
               conversation={[
-                { type: "RECEIVED", text: "Thank youuuu! <3" },
-                { type: "RECEIVED", text: "You're the best!!" }
+                {
+                  type: "RECEIVED",
+                  text: { en: "Thank you <3", es: "Muchas gracias <3" }
+                },
+                {
+                  type: "RECEIVED",
+                  text: {
+                    en: "You are the best!!! ",
+                    es: "Eres el/la mejor!!!"
+                  }
+                }
               ]}
               setAnimationEnded={setAnimationEnded}
             />
@@ -265,7 +381,7 @@ function App() {
                     type="email"
                     name="email"
                     value={formData.email}
-                    placeholder="Enter your email"
+                    placeholder="Email"
                   />
                 </FormControl>
                 <FormControl>
@@ -274,7 +390,13 @@ function App() {
                     type="text"
                     name="name"
                     value={formData.name}
-                    placeholder="Enter your name"
+                    placeholder={getTranslatedText(
+                      {
+                        en: "Name",
+                        es: "Nombre"
+                      },
+                      language
+                    )}
                   />
                 </FormControl>
                 <FormControl>
@@ -283,7 +405,13 @@ function App() {
                     type="text"
                     name="comment"
                     value={formData.comment}
-                    placeholder="Enter a comment"
+                    placeholder={getTranslatedText(
+                      {
+                        en: "Comment",
+                        es: "Commentario"
+                      },
+                      language
+                    )}
                   />
                 </FormControl>
                 <FormControl>
@@ -291,13 +419,25 @@ function App() {
                 </FormControl>
                 <FormControl>
                   <button className="" type="submit">
-                    Send your wish
+                    {getTranslatedText(
+                      {
+                        en: "Send your wish",
+                        es: "Envíale tu deseo"
+                      },
+                      language
+                    )}
                   </button>
                 </FormControl>
                 <Instructions>
-                  Submit a short video with a duration of 15-30s in common video
-                  format. You can re-submit it, just let me know which version I
-                  should use.
+                  {getTranslatedText(
+                    {
+                      en:
+                        "Submit a short video with a duration of 15-30s in common video format. You can re-submit it, just let me know which version I should use.",
+                      es:
+                        "Envía tu pequeño vídeo de 15-30s en un formato común de vídeo. Puedes volver a subirlo cuando quieras, sólo dime cuál usar."
+                    },
+                    language
+                  )}
                 </Instructions>
               </FormWrapper>
             </>
