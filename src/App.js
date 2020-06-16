@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 const Body = styled.div`
   min-height: 100vh;
@@ -43,10 +43,12 @@ const JesusPhoto = styled.img`
   height: auto;
   display: flex;
   align-self: flex-end;
+  position: sticky;
+  bottom: 0;
   filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.25));
 
   @media (max-width: 575.98px) {
-    width: 100%;
+    display: none;
   }
 `;
 
@@ -56,31 +58,6 @@ const Main = styled.div`
   flex: 1;
   flex-direction: column;
 `;
-
-const AnimatedTypewritterStyle = styled.div`
-  font-weight: 400;
-  font-size: 1.5em;
-  white-space: pre-line;
-`;
-
-const AnimatedTypewritter = ({ children, setAnimationEnded = undefined }) => {
-  const [charEnd, setCharEnd] = useState(0);
-
-  useEffect(() => {
-    if (charEnd < children.length) {
-      setTimeout(() => setCharEnd(current => ++current), 50);
-    } else {
-      setCharEnd(children.length);
-      setAnimationEnded && setAnimationEnded(true);
-    }
-  }, [charEnd, children.length, setAnimationEnded]);
-
-  return (
-    <AnimatedTypewritterStyle>
-      {children.slice(0, charEnd)}
-    </AnimatedTypewritterStyle>
-  );
-};
 
 const FormWrapper = styled.form`
   margin-top: 2em;
@@ -119,6 +96,73 @@ const Instructions = styled.div`
   text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
 `;
 
+const slideTop = keyframes`
+  0% {
+    transform: translateY(25px);
+  }
+  100% {
+    transform: none;
+  }
+`;
+
+const Message = styled.div`
+  display: flex;
+  justify-content: ${props =>
+    props.type === "SENT" ? "flex-end" : "flex-start"};
+  width: 100%;
+  margin: 0.5em 0;
+
+  span {
+    max-width: 50%;
+    animation: ${slideTop} 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    border-radius: 5px;
+    padding: 0.5em;
+    font-size: 1.25em;
+    color: black;
+    background-color: ${props =>
+      props.type === "SENT" ? "rgb(225, 255, 199)" : "white"};
+    box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
+
+    @media (max-width: 575.98px) {
+      max-width: 90%;
+    }
+  }
+`;
+
+const AnimatedConversationWrapper = styled.div`
+  width: 100%;
+  padding: 0 0.5em;
+`;
+
+const AnimatedConversation = ({ conversation, setAnimationEnded }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < conversation.length) {
+      setTimeout(() => {
+        setCurrentIndex(current => ++current);
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 1500);
+    } else {
+      setCurrentIndex(conversation.length);
+      setTimeout(() => {
+        setAnimationEnded && setAnimationEnded(true);
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 1500);
+    }
+  }, [currentIndex, conversation.length, setAnimationEnded]);
+
+  return (
+    <AnimatedConversationWrapper>
+      {conversation.slice(0, currentIndex).map(({ type, text, id }) => (
+        <Message key={`message-${id}`} type={type}>
+          <span>{text}</span>
+        </Message>
+      ))}
+    </AnimatedConversationWrapper>
+  );
+};
+
 function App() {
   const [animationHasEnded, setAnimationEnded] = useState(false);
   const [formSent, setFormSent] = useState(false);
@@ -149,20 +193,68 @@ function App() {
         <JesusPhoto src={`${process.env.PUBLIC_URL}/jesus.png`} alt="Jesus" />
         <Main>
           {!formSent && (
-            <AnimatedTypewritter setAnimationEnded={setAnimationEnded}>
-              {`Heeey! Ionut here ;). Jesús is getting old. To be exactly, he'll be 30 very soon... 
-              
-              Due to the importance of this event... I had an idea and I want you to be IN. 😎
-              
-              I'd like you to be part of the celebration 🎉, of the new chapter of his life. 
-              
-              What do you have to do? Submit your wish (a mini-clip) until next June 23rd.`}
-            </AnimatedTypewritter>
+            <AnimatedConversation
+              conversation={[
+                { id: 1, type: "RECEIVED", text: "Guess who's here?" },
+                { id: 2, type: "SENT", text: "Who?? 🤔" },
+                { id: 3, type: "RECEIVED", text: "Ionut is here 😎" },
+                { id: 4, type: "SENT", text: "What do you want from me? 😏" },
+                {
+                  id: 5,
+                  type: "RECEIVED",
+                  text: "As you may know, Jesús is getting..."
+                },
+                {
+                  id: 6,
+                  type: "RECEIVED",
+                  text: "Really old..."
+                },
+                { id: 7, type: "RECEIVED", text: "He'll be 30 yo very soon" },
+                { id: 8, type: "SENT", text: "🙀" },
+                { id: 9, type: "RECEIVED", text: "HAHAHAH 😂" },
+                {
+                  id: 10,
+                  type: "RECEIVED",
+                  text:
+                    "I want to prepare for him a big surprise. Are you curious? 😏"
+                },
+                { id: 11, type: "SENT", text: "YESSS!!! 😎" },
+                {
+                  id: 12,
+                  type: "RECEIVED",
+                  text:
+                    "Coool! I want you to record a short video wishing him something"
+                },
+                {
+                  id: 13,
+                  type: "RECEIVED",
+                  text:
+                    'Maybe... "I loveee you!! Your the best and I wish you for the 30s to be more quiet" 😂'
+                },
+                {
+                  id: 14,
+                  type: "RECEIVED",
+                  text:
+                    "Whatever you want. 15-30s duration is enough. You can do it until June 23rd"
+                },
+                {
+                  id: 15,
+                  type: "RECEIVED",
+                  text: "So take your phone, press REC and fill the next form."
+                },
+                { id: 16, type: "RECEIVED", text: "Thank you <3" }
+              ]}
+              setAnimationEnded={setAnimationEnded}
+            />
           )}
           {formSent && (
-            <AnimatedTypewritter setAnimationEnded={setAnimationEnded}>
-              {`Thank you <3`}
-            </AnimatedTypewritter>
+            <AnimatedConversation
+              conversation={[
+                { type: "RECEIVED", text: "Thank youuuu! <3" },
+                { type: "RECEIVED", text: "You're the best!!" }
+              ]}
+              setAnimationEnded={setAnimationEnded}
+            />
           )}
           {animationHasEnded && !formSent && (
             <>
