@@ -68,6 +68,7 @@ const Main = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  margin-bottom: 5%;
 `;
 
 const FormWrapper = styled.form`
@@ -320,7 +321,7 @@ function App() {
                   type: "RECEIVED",
                   text: {
                     en:
-                      'Maybe... "I loveee you!! Your the best and I wish you for the 30s to be more quiet" 😂',
+                      'Maybe... "I loveee you!! You\'re the best and I wish you for the 30s to be more quiet" 😂',
                     es:
                       'Quizás... "Te quierooo!! Eres el mejor y deseo que para los 30 seas más calladito" 😂'
                   }
