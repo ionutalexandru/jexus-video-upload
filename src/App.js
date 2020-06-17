@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import styled, { keyframes } from "styled-components";
+import firebase from "./firebase";
 
 const Body = styled.div`
   min-height: 100vh;
@@ -99,6 +100,12 @@ const FormControl = styled.div`
   input {
     width: 100%;
   }
+
+  input[required] {
+    border-width: 2px;
+    border-style: dashed;
+    border-color: black;
+  }
 `;
 
 const Instructions = styled.div`
@@ -188,9 +195,15 @@ const AnimatedConversation = ({
 
 const LANGUAGES = ["en", "es"];
 
+const makeVideoFileUnique = name => {
+  const dateNow = Date.now();
+  return `video_${name.split(" ").join("_")}_${dateNow}`;
+};
+
 function App() {
   const [language, setLanguage] = useState("en");
-
+  const [isSending, setSending] = useState(false);
+  const db = firebase.firestore();
   useEffect(() => {
     const browserLanguage = window.navigator.language.slice(0, 2);
     if (LANGUAGES.includes(browserLanguage)) {
@@ -202,12 +215,48 @@ function App() {
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    comment: ""
+    comment: "",
+    videoFileName: ""
   });
+  const formRef = useRef();
 
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault();
-    console.log(e);
+    setSending(true);
+    if (!formData.name && !formRef.current.files.length) {
+      alert(
+        getTranslatedText(
+          {
+            en: "Please fill the required fields",
+            es: "Por favor rellena los campos requeridos"
+          },
+          language
+        )
+      );
+      setSending(false);
+      return;
+    }
+    try {
+      const file = formRef.current.file.files[0];
+      const fileRef = await firebase
+        .storage()
+        .ref(`videos/${formData.videoFileName}`);
+      await fileRef.put(file);
+      await db.collection("wishes").add(formData);
+    } catch {
+      alert(
+        getTranslatedText(
+          {
+            en: "Something went wrong. Contact me!",
+            es: "Algo ha ido mal. Contáctame"
+          },
+          language
+        )
+      );
+      setSending(false);
+      return;
+    }
+    setSending(false);
     setFormSent(true);
   };
 
@@ -215,6 +264,26 @@ function App() {
     const target = e.target;
     const { name, value } = target;
     setFormData(currentFormData => ({ ...currentFormData, [name]: value }));
+  };
+
+  const handleFileChnage = e => {
+    e.preventDefault();
+    const file = e.target.files[0];
+    if (file.size > 15728640) {
+      e.target.value = "";
+      alert(
+        getTranslatedText(
+          {
+            en: "File too big. Max 15MB.",
+            es: "Archivo muy grande. Máx. 15MB."
+          },
+          language
+        )
+      );
+      return;
+    }
+    const videoFileName = makeVideoFileUnique(file.name);
+    setFormData(currentFormData => ({ ...currentFormData, videoFileName }));
   };
 
   return (
@@ -334,9 +403,9 @@ function App() {
                   type: "RECEIVED",
                   text: {
                     en:
-                      "Whatever you want. 15-30s duration is enough. You can do it until June 23rd",
+                      "Whatever you want. 15-30s duration and with a size of 15MB is enough. You can do it until June 23rd",
                     es:
-                      "Lo que quieras. 15-30s de duración es suficiente. Puedes hacerlo antes del 23 de junio"
+                      "Lo que quieras. 15-30s de duración y un peso máximo de 15MB es suficiente. Puedes hacerlo antes del 23 de junio"
                   }
                 },
                 {
@@ -362,10 +431,12 @@ function App() {
               language={language}
               conversation={[
                 {
+                  id: 1,
                   type: "RECEIVED",
                   text: { en: "Thank you <3", es: "Muchas gracias <3" }
                 },
                 {
+                  id: 2,
                   type: "RECEIVED",
                   text: {
                     en: "You are the best!!! ",
@@ -378,9 +449,10 @@ function App() {
           )}
           {animationHasEnded && !formSent && (
             <>
-              <FormWrapper onSubmit={onSubmit}>
+              <FormWrapper onSubmit={onSubmit} ref={formRef}>
                 <FormControl>
                   <input
+                    required
                     onChange={handleInputChange}
                     type="text"
                     name="name"
@@ -410,17 +482,31 @@ function App() {
                   />
                 </FormControl>
                 <FormControl>
-                  <input type="file" />
+                  <input
+                    required
+                    name="file"
+                    type="file"
+                    onChange={handleFileChnage}
+                    accept="video/*"
+                  />
                 </FormControl>
                 <FormControl>
-                  <button className="" type="submit">
-                    {getTranslatedText(
-                      {
-                        en: "Send your wish",
-                        es: "Envíale tu deseo"
-                      },
-                      language
-                    )}
+                  <button type="submit" disabled={isSending}>
+                    {!isSending
+                      ? getTranslatedText(
+                          {
+                            en: "Send your wish",
+                            es: "Envíale tu deseo"
+                          },
+                          language
+                        )
+                      : getTranslatedText(
+                          {
+                            en: "Sending...",
+                            es: "Enviando..."
+                          },
+                          language
+                        )}
                   </button>
                 </FormControl>
                 <Instructions>
