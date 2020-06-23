@@ -269,13 +269,13 @@ function App() {
   const handleFileChnage = e => {
     e.preventDefault();
     const file = e.target.files[0];
-    if (file.size > 15728640) {
+    if (file.size > 157286400) {
       e.target.value = "";
       alert(
         getTranslatedText(
           {
-            en: "File too big. Max 15MB.",
-            es: "Archivo muy grande. Máx. 15MB."
+            en: "File too big. Max 150MB.",
+            es: "Archivo muy grande. Máx. 150MB."
           },
           language
         )
@@ -353,8 +353,8 @@ function App() {
                   id: 7,
                   type: "RECEIVED",
                   text: {
-                    en: "He'll be 30 yo very soon",
-                    es: "Tendrá 30 muy pronto"
+                    en: "He'll be 30 yo very soon (next 26th 😱)",
+                    es: "Tendrá 30 muy pronto (el próximo 26 😱)"
                   }
                 },
                 { id: 8, type: "SENT", text: "🙀" },
@@ -403,9 +403,17 @@ function App() {
                   type: "RECEIVED",
                   text: {
                     en:
-                      "Whatever you want. 15-30s duration and with a size of 15MB is enough. You can do it until June 23rd",
+                      "Whatever you want. 15-30s duration and with a size of 150MB is enough. You can do it until June 23rd",
                     es:
-                      "Lo que quieras. 15-30s de duración y un peso máximo de 15MB es suficiente. Puedes hacerlo antes del 23 de junio"
+                      "Lo que quieras. 15-30s de duración y un peso máximo de 150MB es suficiente. Puedes hacerlo antes del 23 de junio"
+                  }
+                },
+                {
+                  id: 99,
+                  type: "RECEIVED",
+                  text: {
+                    en: "Very important, the video in landscape mode❗❗❗❗",
+                    es: "Muy importante, el vídeo en horizontal❗❗❗❗"
                   }
                 },
                 {
